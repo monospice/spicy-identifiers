@@ -1,0 +1,27 @@
+{
+    "name": "monospice/spicy-method-parser",
+    "description": "An easy way to parse and manipulate method names.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Cy Rossignol",
+            "email": "cy.rossignol@yahoo.com"
+        }
+    ],
+    "require": {
+    },
+    "require-dev": {
+        "phpspec/phpspec": "~2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Monospice\\SpicyMethodParser\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "tests\\": "tests/"
+         }
+    }
+}
