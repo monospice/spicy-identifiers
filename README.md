@@ -19,7 +19,7 @@ Simple Example
 // Call a dynamic method:
 $someClass->callDynamicMethod('some argument');
 
-// The dynamic method call is handled by the __call() magic method of the class.
+// The dynamic method call is handled by the __call() magic method of a class.
 // $methodCalled is the name of the dynamic method: "callDynamicMethod"
 public function __call($methodCalled, array $arguments)
 {
