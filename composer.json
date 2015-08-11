@@ -1,6 +1,6 @@
 {
-    "name": "monospice/spicy-method-parser",
-    "description": "An easy way to parse and manipulate method names.",
+    "name": "monospice/spicy-identifiers",
+    "description": "An easy way to parse and manipulate identifier names.",
     "type": "library",
     "license": "MIT",
     "authors": [
