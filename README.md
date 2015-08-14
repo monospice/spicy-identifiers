@@ -152,7 +152,7 @@ only perform the preceding operation if the identifier part matches the given
 string.
 
 ```php
-echo $identifier->pop()->if('an');      // "identifierName"
+echo $identifier->shift()->if('an');      // "identifierName"
 echo $identifier->insert(1)->if('nope'); // "anIdentifierName"
 echo $identifier->mergeRange->if([      // "anIdentifierName"
     1 => 'Identifier',
