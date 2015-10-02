@@ -3,6 +3,7 @@
 namespace Monospice\SpicyIdentifiers;
 
 use Monospice\SpicyIdentifiers\Tools\CaseFormat;
+use Monospice\SpicyIdentifiers\Tools\Formatter;
 
 /**
  * Parses and manipulates identifier names. Useful when working with dynamic
@@ -12,33 +13,33 @@ use Monospice\SpicyIdentifiers\Tools\CaseFormat;
  */
 class DynamicIdentifier implements Interfaces\DynamicIdentifier
 {
-
     use DynamicIdentifierFactory;
 
     /**
-     * array The array of identifier parts
+     * The string constant representing the default case to use for this
+     * identifier type if no output case format has been explicitly set
      *
      * @internal
+     * @var string
+     */
+    protected static $defaultCase = CaseFormat::CAMEL_CASE;
+
+    /**
+     * The array of identifier parts
+     *
+     * @internal
+     * @var array
      */
     protected $identifierParts;
 
     /**
-     * string The string constant representing the case to use when outputting
+     * The string constant representing the case to use when outputting
      * or accessing an identifier name
      *
      * @internal
+     * @var string
      */
     protected $outputCase;
-
-    /**
-     * string The string constant representing the default case to use if no
-     * output case format has been explicitly set. This defaults to the case
-     * from which the identifier name was parsed
-     *
-     * @internal
-     */
-    protected $defaultCase;
-
 
     /**
      * Create a new DynamicIdentifier instance. Instead of using the constructor,
@@ -47,59 +48,58 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
      * @see Factory The IdentiferParser factory methods
      *
      * @param array $parts The array of identifier parts
-     * @param string $defaultCase The string constant representing the default
      * case that will be used
      */
-    public function __construct(array $parts, $defaultCase)
+    public function __construct(array $parts)
     {
         $this->identifierParts = $parts;
-        $this->defaultCase = $defaultCase;
     }
-
 
     // Inherit Doc from Interfaces\DynamicIdentifier
     public function setOutputCase($outputCaseConstant)
     {
         switch ($outputCaseConstant) {
-            case CaseFormat::CAMEL_CASE: // pass-through case
+            case CaseFormat::CAMEL_CASE:
+                // pass-through case
             case CaseFormat::UNDERSCORE:
                 $this->outputCase = $outputCaseConstant;
                 return $this;
             default:
-                throw new \InvalidArgumentException($outputCaseConstant .
-                    ' is not a constant that represents a valid output case' .
-                    ' format');
+                throw new \InvalidArgumentException(
+                    $outputCaseConstant . ' is not a constant that represents ' .
+                    'a valid output case format'
+                );
         }
     }
-
 
     // Inherit Doc from Interfaces\DynamicIdentifier
     public function getOutputCase()
     {
         if ($this->outputCase === null) {
-            return $this->defaultCase;
+            return static::$defaultCase;
         }
 
         return $this->outputCase;
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function getParts()
+    public function parts()
     {
         return $this->identifierParts;
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function getPart($key)
+    public function part($key)
     {
+        if (! isset($this->identifierParts[$key])) {
+            return null;
+        }
+
         return $this->identifierParts[$key];
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function getPartKeys($partName = null)
+    public function keys($partName = null)
     {
         if ($partName === null) {
             return array_keys($this->identifierParts);
@@ -108,47 +108,49 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
         }
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
     public function getNumParts()
     {
         return count($this->identifierParts);
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function hasPart($key)
+    public function has($key)
     {
-        return array_key_exists($key, $this->identifierParts);
+        return isset($this->identifierParts[$key]);
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function getName()
+    public function first()
     {
-        $buildMethod = 'build' . $this->getOutputCase();
-        return $this->$buildMethod();
+        if ($this->getNumParts() > 0) {
+            return null;
+        }
+
+        return $this->identifierParts[0];
     }
 
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function last()
+    {
+        if ($this->getNumParts() > 0) {
+            return null;
+        }
+
+        return end($this->identifierParts);
+    }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function buildCamelCase()
+    public function name()
     {
-        return lcfirst(
-            implode('', array_map('ucfirst', $this->identifierParts))
+        return Formatter::format(
+            $this->identifierParts,
+            $this->getOutputCase()
         );
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function buildUnderscore()
-    {
-        return strtolower(implode('_', $this->identifierParts));
-    }
-
-
-    // Inherit Doc from Interfaces\DynamicIdentifier
-    public function mergePartsRange($start, $end = null)
+    public function mergeRange($start, $end = null)
     {
         if ($end === null) {
             $end = $this->getNumParts() - 1;
@@ -166,39 +168,148 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
         return $this;
     }
 
-
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function mergePartsRangeIf(array $mergeParts)
+    public function append($part)
     {
-        $numMergeParts = count($mergeParts);
-        $intersection = array_intersect_assoc($this->identifierParts,
-            $mergeParts);
-
-        if (count($intersection) !== $numMergeParts) {
-            return $this;
-        }
-
-        $mergeKeys = array_keys($mergeParts);
-
-        if ($numMergeParts < 2) {
-            $this->mergePartsRange($mergeKeys[0]);
-        } else {
-            $lastKey = $mergeKeys[count($mergeKeys) - 1];
-            $this->mergePartsRange($mergeKeys[0], $lastKey);
-        }
+        $this->identifierParts[] = $part;
 
         return $this;
     }
 
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function push($part)
+    {
+        return $this->append($part);
+    }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function renamePart($part, $renameTo)
+    public function prepend($part)
     {
-        if (array_key_exists($part, $this->identifierParts)) {
-            $this->identifierParts[$part] = $renameTo;
-        }
+        array_unshift($this->identifierParts, $part);
 
         return $this;
     }
 
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function insert($position, $part)
+    {
+        array_splice($this->identifierParts, $position, 0, $part);
+
+        return $this;
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function pop()
+    {
+        array_pop($this->identifierParts);
+
+        return $this;
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function shift()
+    {
+        array_shift($this->identifierParts);
+
+        return $this;
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function remove($key)
+    {
+        array_splice($this->identifierParts, $key, 1);
+
+        return $this;
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function replace($position, $replaceWith)
+    {
+        if (! array_key_exists($position, $this->identifierParts)) {
+            throw new \OutOfBoundsException(
+                'No identifier part exists at the specified position: ' .
+                $position
+            );
+        }
+
+        $this->identifierParts[$position] = $replaceWith;
+
+        return $this;
+    }
+
+    /**
+     * Using array access, get the identifier part at the specified position
+     *
+     * @param int $offset The position of the identifier part to get
+     *
+     * @return string The identifier part string
+     */
+    public function offsetGet($offset)
+    {
+        return $this->part($offset);
+    }
+
+    /**
+     * Using array access, set the identifier part at the specified position
+     *
+     * @param int $offset The position to set the identifer part at
+     * @param string $part The value of the identifier part to set
+     *
+     * @return void
+     */
+    public function offsetSet($offset, $part)
+    {
+        if ($offset === null) {
+            $this->append($part);
+        }
+
+        $this->replace($offset, $part);
+    }
+
+    /**
+     * Using array access, determine if an element exists at the specified position
+     *
+     * @param int $offset The position to check
+     *
+     * @return bool True if an element exists at the specified position
+     */
+    public function offsetExists($offset)
+    {
+        return $this->has($offset);
+    }
+
+    /**
+     * Using array access, remove the identifier part at the specified position
+     *
+     * @param int $offset The position to remove an identifier part from
+     *
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->remove($offset);
+    }
+
+    /**
+     * Using PHP's count() function on this object, get the number of
+     * identifer parts
+     *
+     * @return int The number of identifer name parts
+     */
+    public function count()
+    {
+        return $this->getNumParts();
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function toArray()
+    {
+        return $this->parts();
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function __toString()
+    {
+        return $this->name();
+    }
 }

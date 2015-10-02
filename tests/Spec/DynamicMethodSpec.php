@@ -10,24 +10,35 @@ use Monospice\SpicyIdentifiers\DynamicMethod;
 
 class DynamicMethodSpec extends ObjectBehavior
 {
+    /**
+     * An identifier parts array for testing
+     *
+     * @var array
+     */
+    protected $identifierParts;
+
+    function let()
+    {
+        $this->identifierParts = ['name'];
+        $this->beConstructedWith($this->identifierParts);
+    }
+
     function it_is_initializable()
     {
-        $this->beConstructedWith(['method', 'name', 'parts', 'array'],
-            CaseFormat::CAMEL_CASE);
         $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicMethod');
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
     }
 
     function it_determines_if_the_method_exists_in_the_given_context()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['getName']);
+        $this->existsIn($this)->shouldReturn(true);
         $this->exists($this)->shouldReturn(true);
         $this->exists(new \stdClass())->shouldReturn(false);
     }
 
     function it_calls_the_method_represented_by_the_parser()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['getName']);
-        $this->call($this, [])->shouldReturn('getName');
+        $this->callIn($this, [])->shouldReturn('name');
+        $this->call($this, [])->shouldReturn('name');
     }
-
 }

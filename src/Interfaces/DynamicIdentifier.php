@@ -2,13 +2,16 @@
 
 namespace Monospice\SpicyIdentifiers\Interfaces;
 
+use ArrayAccess;
+use Countable;
+
 /**
  * Parses and manipulates identifier names. Useful when working with dynamic
  * method, function, class, and variable names
  *
  * @author Cy Rossignol <cy.rossignol@yahoo.com>
  */
-interface DynamicIdentifier
+interface DynamicIdentifier extends ArrayAccess, Countable
 {
 
     /**
@@ -22,7 +25,10 @@ interface DynamicIdentifier
      * output case format
      *
      * @return DynamicIdentifier The current DynamicIdentifier instance for
-     * chaining
+     * method chaining
+     *
+     * @throws \InvalidArgumentException If not provided with a valid output
+     * case format
      */
     public function setOutputCase($outputCaseConstant);
 
@@ -69,7 +75,7 @@ interface DynamicIdentifier
      *
      * @return array An array of the parts of the identifier name
      */
-    public function getParts();
+    public function parts();
 
     /**
      * Return the value of the identifier part corresponding to the given key
@@ -80,11 +86,29 @@ interface DynamicIdentifier
      *
      * @return string The name of the corresponding identifier part
      */
-    public function getPart($key);
+    public function part($key);
 
     /**
-     * Returns an array of integer keys corresponding to the given identifier
-     * part name value
+     * Get the identifier part at the beginning of the identifier name
+     *
+     * @api
+     *
+     * @return string The name of the first identifier part
+     */
+    public function first();
+
+    /**
+     * Get the identifier part at the end of the identifier name
+     *
+     * @api
+     *
+     * @return string The name of the last identifier part
+     */
+    public function last();
+
+    /**
+     * Get an array of the keys of identifier parts that match the specified
+     * string, or all keys if no string is provided
      *
      * @api
      *
@@ -92,7 +116,7 @@ interface DynamicIdentifier
      *
      * @return array The array of matching integer keys
      */
-    public function getPartKeys($partName = null);
+    public function keys($partName = null);
 
     /**
      * Return the number of identifier parts in the parsed identifier name
@@ -114,7 +138,7 @@ interface DynamicIdentifier
      * @return bool True if the identifier  name parts array contains the
      * corresponding part
      */
-    public function hasPart($key);
+    public function has($key);
 
     /**
      * Get the string representation of the parsed identifier
@@ -123,26 +147,7 @@ interface DynamicIdentifier
      *
      * @return string The string representation of the parsed identifier
      */
-    public function getName();
-
-    /**
-     * Get the camelCase representation of the parsed identifier
-     *
-     * @api
-     *
-     * @return string The camelCase representation of the parsed identifier
-     */
-    public function buildCamelCase();
-
-    /**
-     * Get the underscore (snake_case) representation of the parsed identifier
-     *
-     * @api
-     *
-     * @return string The underscore (snake_case) representation of the parsed
-     * identifier
-     */
-    public function buildUnderscore();
+    public function name();
 
     /**
      * Merge a range of identifier parts
@@ -156,37 +161,119 @@ interface DynamicIdentifier
      * parts will be merged
      *
      * @return DynamicIdentifier The current DynamicIdentifier instance for
-     * chaining
+     * method chaining
      */
-    public function mergePartsRange($start, $end = null);
+    public function mergeRange($start, $end = null);
 
     /**
-     * Merge a range of identifier parts if their key/value pairs match
-     * the key/value pairs in the argument array
+     * Add an identifier part to the end
      *
      * @api
      *
-     * @param array $mergeParts The array containing a range of identifier parts
-     * to merge where the key represents the index of the identifier part and
-     * the value is the expected name of that identifier part
+     * @param string $part The identifier part to append
      *
      * @return DynamicIdentifier The current DynamicIdentifier instance for
-     * chaining
+     * method chaining
      */
-    public function mergePartsRangeIf(array $mergeParts);
+    public function append($part);
 
     /**
-     * Rename an identifier part
+     * An alias for append()
      *
      * @api
      *
-     * @param integer $key The index of the identifier part to rename
+     * @param string $newPart The identifier part to append
+     *
+     * @return DynamicIdentifier The current DynamicIdentifier instance for
+     * method chaining
+     */
+    public function push($part);
+
+    /**
+     * Add an identifier part to the beginning
+     *
+     * @api
+     *
+     * @param string $part The identifier part to prepend
+     *
+     * @return DynamicIdentifier The current DynamicIdentifier instance for
+     * method chaining
+     */
+    public function prepend($part);
+
+    /**
+     * Insert an identifier part at the specified position
+     *
+     * @api
+     *
+     * @param string $part The identifier part to prepend
+     *
+     * @return DynamicIdentifier The current DynamicIdentifier instance for
+     * method chaining
+     */
+    public function insert($position, $part);
+
+    /**
+     * Remove the identifier part at the end
+     *
+     * @api
+     *
+     * @return DynamicIdentifier The current DynamicIdentifier instance for
+     * method chaining
+     */
+    public function pop();
+
+    /**
+     * Remove the identifier part at the beginning
+     *
+     * @api
+     *
+     * @return DynamicIdentifier The current DynamicIdentifier instance for
+     * method chaining
+     */
+    public function shift();
+
+    /**
+     * Remove the identifier part at the specified position
+     *
+     * @api
+     *
+     * @param int $key The index of the identifier part to remove
+     *
+     * @return DynamicIdentifier The current DynamicIdentifier instance for
+     * method chaining
+     */
+    public function remove($key);
+
+    /**
+     * Replace an identifier part
+     *
+     * @api
+     *
+     * @param int $key The index of the identifier part to rename
      * @param string $renameTo The string to rename the specified identifier
      * part to
      *
      * @return DynamicIdentifier The current DynamicIdentifier instance for
-     * chaining
+     * method chaining
+     *
+     * @throws \OutOfBoundsException If no identifier part exists for the
+     * specified index
      */
-    public function renamePart($key, $renameTo);
+    public function replace($key, $renameTo);
 
+    /**
+     * Get the array representation of this object as an array of identifier
+     * parts
+     *
+     * @return array The array of identifier parts
+     */
+    public function toArray();
+
+    /**
+     * Get the string representation of this object as an identifer name string
+     *
+     * @return string The identifier name
+     */
+    public function __toString();
 }

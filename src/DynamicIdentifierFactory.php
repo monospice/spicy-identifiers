@@ -14,32 +14,35 @@ use Monospice\SpicyIdentifiers\Tools\Parser;
 trait DynamicIdentifierFactory
 {
     // Inherit Doc from Interfaces\DynamicIdentifier
+    public static function parse($identifierName)
+    {
+        $parserClass = get_called_class();
+        $caseFormat = $parserClass::$defaultCase;
+
+        return new $parserClass(Parser::parse($identifierName, $caseFormat));
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
     public static function parseFromCamelCase($identifierName)
     {
         $parserClass = get_called_class();
-        return new $parserClass(
-            Parser::parseFromCamelCase($identifierName),
-            CaseFormat::CAMEL_CASE
-        );
+
+        return new $parserClass(Parser::parseFromCamelCase($identifierName));
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
     public static function parseFromUnderscore($identifierName)
     {
         $parserClass = get_called_class();
-        return new $parserClass(
-            Parser::parseFromUnderscore($identifierName),
-            CaseFormat::UNDERSCORE
-        );
+
+        return new $parserClass(Parser::parseFromUnderscore($identifierName));
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
     public static function parseFromHyphen($identifierName)
     {
         $parserClass = get_called_class();
-        return new $parserClass(
-            Parser::parseFromHyphen($identifierName),
-            CaseFormat::HYPHEN
-        );
+
+        return new $parserClass(Parser::parseFromHyphen($identifierName));
     }
 }
