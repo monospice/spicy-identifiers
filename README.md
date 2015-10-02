@@ -1,7 +1,7 @@
 Spicy Identifiers
 =================
 
-[![Build Status](https://travis-ci.org/monospice/spicy-identifier-tools.svg?branch=master)](https://travis-ci.org/monospice/spicy-identifier-tools)
+[![Build Status](https://travis-ci.org/monospice/spicy-identifiers.svg?branch=1.0.x)](https://travis-ci.org/monospice/spicy-identifiers)
 
 **An easy way to parse and manipulate identifier names, such as dynamic method
 names.**
