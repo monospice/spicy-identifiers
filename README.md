@@ -20,7 +20,7 @@ Simple Example
 $someClass->callSomeDynamicMethod('some argument');
 
 // The dynamic method call is handled by the __call() magic method of a class.
-// $methodCalled is the name of the dynamic method: "callDynamicMethod"
+// $methodCalled is the name of the dynamic method: "callSomeDynamicMethod"
 public function __call($methodCalled, array $arguments)
 {
     // Use Spicy Identifiers to work with the dynamic method
@@ -29,8 +29,8 @@ public function __call($methodCalled, array $arguments)
     $method->replace(0, 'get')->replace(2, 'Variable');
     // The dynamic method name is now "getSomeDynamicVariable"
 
-    // Check if the method exists on this class
-    if (! $method->existsOn($this)) {
+    // Check if the method exists in this class
+    if (! $method->existsIn($this)) {
         throw new \BadMethodCallException($methodCalled . ' does not exist');
     }
 
@@ -60,6 +60,9 @@ use Monospice\SpicyIdentifiers\DynamicMethod;
 use Monospice\SpicyIdentifiers\DynamicClass;
 use Monospice\SpicyIdentifiers\Tools\CaseFormat;
 ```
+
+This package automatically installs the related [Spicy Identifier Tools][tools]
+package of classes in the namespace `Monospice\SpicyIdentifiers\Tools`.
 
 Types of Identifiers
 --------------------
@@ -320,9 +323,8 @@ Identifier Case Formats
 Each class uses a default case format to parse and output identifiers. These
 formats are constants set on the `Tools\CaseFormat` class.
 
-For more information see the
-[Spicy Identifier Tools](https://github.com/monospice/spicy-identifier-tools)
-package which this package includes automatically.
+For more information see the [Spicy Identifier Tools][tools] package which
+this package includes automatically.
 
 Identifier Class         | Default Case Format            | Example
 ------------------------ | ------------------------------ | ------------------
@@ -350,7 +352,7 @@ $identifier = DynamicIdentifier::parseFromUnderscore('identifier_name')
 Acronyms in Identifier Names
 ----------------------------
 
-Sometimes identifier names contain acronyms, such as JavaScript's
+Sometimes identifier names contain acronyms, such as `XML` in JavaScript's
 `XMLHttpRequest`. The parsing methods preserve these acronyms:
 
 ```php
@@ -379,7 +381,7 @@ the `::parseFromMixedCase()` method to parse identifiers that contain multiple
 cases:
 
 ```php
-// parseFromMixedCase($identiferString, $arrayOfCases);
+// parseFromMixedCase($identiferString, $arrayOfCaseFormatsToParse);
 
 DynamicIdentifier::parseFromMixedCase('aMixed_case-identifier', [
     CaseFormat::CAMEL_CASE,
@@ -437,3 +439,5 @@ License
 
 The MIT License (MIT). Please see the [LICENSE File](LICENSE) for more
 information.
+
+[tools]: https://github.com/monospice/spicy-identifier-tools "Spicy Identifier Tools"
