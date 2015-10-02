@@ -79,20 +79,45 @@ class DynamicIdentifierSpec extends ObjectBehavior
 
     function it_parses_an_identifier_name_into_an_array_from_camel_case()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['aIdentifierName']);
-        $this->parts()->shouldReturn(['a', 'Identifier', 'Name']);
+        $this->beConstructedThrough('parseFromCamelCase', ['anIdentifierName']);
+        $this->parts()->shouldReturn(['an', 'Identifier', 'Name']);
+    }
+
+    function it_parses_an_identifier_name_into_an_array_from_extended_camel()
+    {
+        $this->beConstructedThrough(
+            'parseFromCamelCaseExtended',
+            ['änÏdentifierNáme']
+        );
+        $this->parts()->shouldReturn(['än', 'Ïdentifier', 'Náme']);
     }
 
     function it_parses_an_identifier_name_into_an_array_from_underscores()
     {
-        $this->beConstructedThrough('parseFromUnderscore', ['a_identifier_name']);
-        $this->parts()->shouldReturn(['a', 'identifier', 'name']);
+        $this->beConstructedThrough(
+            'parseFromUnderscore',
+            ['an_identifier_name']
+        );
+        $this->parts()->shouldReturn(['an', 'identifier', 'name']);
     }
 
     function it_parses_an_identifier_name_into_an_array_from_hyphenated_case()
     {
         $this->beConstructedThrough('parseFromHyphen', ['an-identifier-name']);
         $this->parts()->shouldReturn(['an', 'identifier', 'name']);
+    }
+
+    function it_parses_an_identifier_name_into_an_array_from_mixed_case()
+    {
+        $this->beConstructedThrough(
+            'parseFromMixedCase',
+            ['aMixed_case-identifier',[
+                CaseFormat::CAMEL_CASE,
+                CaseFormat::UNDERSCORE,
+                CaseFormat::HYPHEN,
+            ]]
+        );
+        $this->parts()->shouldReturn(['a', 'Mixed', 'case', 'identifier']);
     }
 
     function it_parses_an_identifier_name_into_an_array_from_the_default_case()

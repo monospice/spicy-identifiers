@@ -56,6 +56,19 @@ interface DynamicIdentifier extends ArrayAccess, Countable
     public static function parseFromCamelCase($name);
 
     /**
+     * Break an identifier name containing extended ASCII characters into an
+     * array based on uppercase words in camel case
+     *
+     * @api
+     *
+     * @param string $name The identifier name string to parse
+     *
+     * @return DynamicIdentifier An instance of DynamicIdentifier containing the
+     * parsed identifier name data
+     */
+    public static function parseFromCamelCaseExtended($name);
+
+    /**
      * Break an identifier name into an array based on words seperated by
      * underscores
      *
@@ -67,6 +80,32 @@ interface DynamicIdentifier extends ArrayAccess, Countable
      * parsed identifier name data
      */
     public static function parseFromUnderscore($name);
+
+    /**
+     * Break an identifier name into an array based on words seperated by
+     * hyphens
+     *
+     * @api
+     *
+     * @param string $name The identifier name string to parse
+     *
+     * @return DynamicIdentifier An instance of DynamicIdentifier containing the
+     * parsed identifier name data
+     */
+    public static function parseFromHyphen($name);
+
+    /**
+     * Break an identifier name into an array based on words seperated by
+     * multiple case formats
+     *
+     * @api
+     *
+     * @param string $name The identifier name string to parse
+     *
+     * @return DynamicIdentifier An instance of DynamicIdentifier containing the
+     * parsed identifier name data
+     */
+    public static function parseFromMixedCase($name, $arrayOfCaseFormats);
 
     /**
      * Return an array of the identifier parts

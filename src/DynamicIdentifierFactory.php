@@ -31,6 +31,16 @@ trait DynamicIdentifierFactory
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
+    public static function parseFromCamelCaseExtended($identifierName)
+    {
+        $parserClass = get_called_class();
+
+        return new $parserClass(
+            Parser::parseFromCamelCaseExtended($identifierName)
+        );
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
     public static function parseFromUnderscore($identifierName)
     {
         $parserClass = get_called_class();
@@ -44,5 +54,15 @@ trait DynamicIdentifierFactory
         $parserClass = get_called_class();
 
         return new $parserClass(Parser::parseFromHyphen($identifierName));
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public static function parseFromMixedCase($name, $arrayOfCaseFormats)
+    {
+        $parserClass = get_called_class();
+
+        return new $parserClass(
+            Parser::parseFromMixedCase($name, $arrayOfCaseFormats)
+        );
     }
 }
