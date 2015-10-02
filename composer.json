@@ -1,15 +1,18 @@
 {
     "name": "monospice/spicy-identifiers",
-    "description": "An easy way to parse and manipulate identifier names.",
+    "description": "An easy way to parse and manipulate identifier names, such as dynamic method names.",
+    "keywords": ["dynamic", "method", "variable", "parser"],
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Cy Rossignol",
-            "email": "cy.rossignol@yahoo.com"
+            "email": "cy@rossignols.me"
         }
     ],
     "require": {
+        "php": ">=5.4.0",
+        "monospice/spicy-identifier-tools": "~1.0"
     },
     "require-dev": {
         "phpspec/phpspec": "~2.2"
@@ -21,7 +24,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "tests\\": "tests/"
+            "Monospice\\SpicyIdentifiers\\Test\\": "tests/"
          }
     }
 }
