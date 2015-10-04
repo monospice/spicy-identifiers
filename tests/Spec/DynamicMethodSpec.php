@@ -38,7 +38,7 @@ class DynamicMethodSpec extends ObjectBehavior
 
     function it_calls_the_method_represented_by_the_parser()
     {
-        $this->callIn($this, [])->shouldReturn('name');
-        $this->call($this, [])->shouldReturn('name');
+        $this->callIn($this)->shouldReturn('name');
+        $this->call($this)->shouldReturn('name');
     }
 }

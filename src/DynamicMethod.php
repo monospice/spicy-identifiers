@@ -35,7 +35,7 @@ class DynamicMethod extends DynamicIdentifier implements Interfaces\DynamicMetho
     }
 
     // Inherit Doc from Interfaces\DynamicMethod
-    public function callIn($context, array $arguments)
+    public function callIn($context, array $arguments = [])
     {
         $methodName = $this->name();
 
@@ -43,7 +43,7 @@ class DynamicMethod extends DynamicIdentifier implements Interfaces\DynamicMetho
     }
 
     // Inherit Doc from Interfaces\DynamicMethod
-    public function call($context, array $arguments)
+    public function call($context, array $arguments = [])
     {
         return $this->callIn($context, $arguments);
     }

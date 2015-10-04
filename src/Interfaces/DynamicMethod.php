@@ -46,7 +46,7 @@ interface DynamicMethod extends DynamicIdentifier
      *
      * @return mixed The return value of the called method
      */
-    public function callIn($context, array $arguments);
+    public function callIn($context, array $arguments = []);
 
     /**
      * An alias for callIn()
@@ -61,5 +61,5 @@ interface DynamicMethod extends DynamicIdentifier
      *
      * @return mixed The return value of the called method
      */
-    public function call($context, array $arguments);
+    public function call($context, array $arguments = []);
 }
