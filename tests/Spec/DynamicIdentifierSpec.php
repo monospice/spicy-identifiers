@@ -40,6 +40,11 @@ class DynamicIdentifierSpec extends ObjectBehavior
         $this->shouldImplement('\Countable');
     }
 
+    function it_returns_the_entire_identifier_name()
+    {
+        $this->name()->shouldReturn('anIdentifierName');
+    }
+
     function it_returns_the_array_of_parsed_identifier_name_parts()
     {
         $this->parts()->shouldReturn($this->identifierParts);
@@ -48,6 +53,16 @@ class DynamicIdentifierSpec extends ObjectBehavior
     function it_returns_the_value_of_a_single_identifier_name_part()
     {
         $this->part(0)->shouldReturn($this->identifierParts[0]);
+    }
+
+    function it_returns_the_value_of_the_first_identifer_name_part()
+    {
+        $this->first()->shouldReturn($this->identifierParts[0]);
+    }
+
+    function it_returns_the_value_of_the_last_identifer_name_part()
+    {
+        $this->last()->shouldReturn(end($this->identifierParts));
     }
 
     function it_returns_all_of_the_identifier_part_keys()
@@ -124,6 +139,11 @@ class DynamicIdentifierSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('parse', ['aIdentifierName']);
         $this->parts()->shouldReturn(['a', 'Identifier', 'Name']);
+    }
+
+    function it_returns_the_current_output_case()
+    {
+        $this->getOutputCase()->shouldReturn(CaseFormat::CAMEL_CASE);
     }
 
     function it_sets_the_default_output_case_using_the_default_case_format()

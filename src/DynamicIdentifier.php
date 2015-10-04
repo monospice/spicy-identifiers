@@ -123,7 +123,7 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
     // Inherit Doc from Interfaces\DynamicIdentifier
     public function first()
     {
-        if ($this->getNumParts() > 0) {
+        if ($this->getNumParts() < 1) {
             return null;
         }
 
@@ -133,7 +133,7 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
     // Inherit Doc from Interfaces\DynamicIdentifier
     public function last()
     {
-        if ($this->getNumParts() > 0) {
+        if ($this->getNumParts() < 1) {
             return null;
         }
 
