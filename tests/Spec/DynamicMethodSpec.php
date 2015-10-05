@@ -31,14 +31,57 @@ class DynamicMethodSpec extends ObjectBehavior
 
     function it_determines_if_the_method_exists_in_the_given_context()
     {
-        $this->existsIn($this)->shouldReturn(true);
-        $this->exists($this)->shouldReturn(true);
-        $this->exists(new \stdClass())->shouldReturn(false);
+        $this->existsOn($this)->shouldReturn(true);
     }
 
     function it_calls_the_method_represented_by_the_parser()
     {
-        $this->callIn($this)->shouldReturn('name');
-        $this->call($this)->shouldReturn('name');
+        $this->callOn($this)->shouldReturn('name');
+    }
+
+    function it_calls_the_static_method_represented_by_the_parser()
+    {
+        $this->beConstructedThrough('parseFromCamelCase', ['staticTest']);
+        $this->callOn('Spec\Monospice\SpicyIdentifiers\StaticTestStub')
+            ->shouldReturn('static');
+    }
+
+    function it_invokes_the_method_represented_by_the_parser()
+    {
+        $this->beConstructedThrough('parseFromCamelCase', ['privateTest']);
+        $privateTestStub = new \Spec\Monospice\SpicyIdentifiers\PrivateTestStub;
+
+        $this->invokeOn($privateTestStub)->shouldReturn('private');
+    }
+
+    function it_statically_invokes_the_method_represented_by_the_parser()
+    {
+        $this->beConstructedThrough('parseFromCamelCase', ['privateTest']);
+        $this->invokeOn('Spec\Monospice\SpicyIdentifiers\PrivateTestStub')
+            ->shouldReturn('private');
+    }
+
+    function it_forwards_the_static_call_to_a_method_represented_by_the_parser()
+    {
+        $this->beConstructedThrough('parseFromCamelCase', ['staticTest']);
+        $this->forwardStaticCallTo(
+            'Spec\Monospice\SpicyIdentifiers\StaticTestStub'
+        )->shouldReturn('static');
+    }
+}
+
+class StaticTestStub
+{
+    public static function staticTest()
+    {
+        return 'static';
+    }
+}
+
+class PrivateTestStub
+{
+    private static function privateTest()
+    {
+        return 'private';
     }
 }
