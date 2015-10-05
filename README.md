@@ -30,14 +30,14 @@ public function __call($methodCalled, array $arguments)
     // The dynamic method name is now "getSomeDynamicVariable"
 
     // Check if the method exists in this class
-    if (! $method->existsIn($this)) {
+    if (! $method->existsOn($this)) {
         throw new \BadMethodCallException($methodCalled . ' does not exist');
     }
 
     // Check that the method includes the word "Dynamic" in the name,
     // then call the method represented by the name and return that value
     if ($method->has(1) && $method[1] === 'Dynamic') {
-        return $method->callIn($this, $arguments);
+        return $method->callOn($this, $arguments);
     }
 
     throw new \BadMethodCallException($methodCalled . ' is not supported');
@@ -55,8 +55,8 @@ If you're autoloading classes (hopefully):
 
 ```php
 use Monospice\SpicyIdentifiers\DynamicVariable;
-use Monospice\SpicyIdentifiers\DynamicFunction;
 use Monospice\SpicyIdentifiers\DynamicMethod;
+use Monospice\SpicyIdentifiers\DynamicFunction;
 use Monospice\SpicyIdentifiers\DynamicClass;
 use Monospice\SpicyIdentifiers\Tools\CaseFormat;
 ```
@@ -92,7 +92,7 @@ $method = DynamicMethod::parse('aMethodName');
 $someVar = DynamicVariable::parse('aVariableName');
 $class = DynamicClass::parse('AClassName');
 
-$method->parts(); // array('a', 'Method', 'Name');
+$method->parts(); // array('a', 'Method', 'Name')
 ```
 
 The `::parse()` method uses the default case format for the identifer type
@@ -101,10 +101,25 @@ specific format, use the respective parsing method:
 
 ```php
 $method = DynamicMethod::parseFromUnderscore('a_method_name');
-$method->parts(); // array('a', 'method', 'name');
+$method->parts(); // array('a', 'method', 'name')
 ```
 
 More information about identifier case formats below.
+
+Loading an Identifier
+---------------------
+
+Sometimes an identifier may not need to be parsed into each part, such as when
+using this package to call dynamic methods. To improve performance in these
+cases, use the `::load()` factory method to load the whole identifier string
+without invoking the parser.
+
+```php
+$method = DynamicMethod::load('aMethodName');
+$method->parts(); // array('aMethodName')
+
+$returnValue = $method->callOn($this);
+```
 
 Identifier Manipulation
 -----------------------
@@ -286,23 +301,82 @@ Dynamic Methods
 ---------------
 
 The `DynamicMethod` class adds functionality for working with an underlying
-class method that corresponds to the parsed method name.
-
-**existsIn()** - check if the represented method exists in the given context
+class method that corresponds to the parsed identifier name.
 
 ```php
-$method->existsIn('SomeClass');
-$method->existsIn($this);
-$method->exists($this); // alias for existsIn()
+$method = DynamicMethod::parse('someMethod');
 ```
 
-**callIn()** - call the method represented by the parsed method name in the
+**existsOn()** - check if the represented method exists in the given class
+context
+
+```php
+$method->existsOn('SomeClass');
+$method->existsOn($someInstance);
+$method->existsOn($this);
+```
+
+**callOn()** - call the method represented by the parsed method name in the
 given context
 
 ```php
-$returnValue = $method->callIn('SomeClass', ['arg1', 'arg2']);
-$returnValue = $method->callIn($this, ['arg1', 'arg2']);
-$returnValue = $method->call($this, ['arg1']); // alias for callIn()
+$returnValue = $method->callOn($someInstance);
+$returnValue = $method->callOn($someInstance, ['arg1', 'arg2']);
+$returnValue = $method->callOn($this, ['arg1', 'arg2']);
+
+// Static Methods
+$returnValue = $method->callOn('Namespace\SomeClass');
+$returnValue = $method->callOn('Namespace\SomeClass', ['arg1']);
+```
+
+**invokeOn()** - invokes the method represented by the parsed method name in
+the given context
+
+This method is similar to `callOn()`, but it permits access to private and
+protected methods that cannot be called directly. `invokeOn()` is intented for
+DynamicMethod instances used inside a class that could otherwise normally access
+its private and protected members directly. One should consider this use
+carefully before choosing this method, and always use `callOn()` for public
+methods.
+
+```php
+$returnValue = $method->invokeOn($someInstance);
+$returnValue = $method->invokeOn($this, ['arg1', 'arg2']);
+
+// Static Methods
+$returnValue = $method->invokeOn('Namespace\SomeClass');
+$returnValue = $method->invokeOn('Namespace\SomeClass', ['arg1']);
+```
+
+**forwardStaticCallTo()** - forward the static method represented by the parsed method
+name in the given context
+
+```php
+$returnValue = $method->forwardStaticCallTo('Namespace\SomeClass');
+$returnValue = $method->forwardStaticCallTo('SomeClass', ['arg1', 'arg2']);
+```
+
+Dynamic Functions
+-----------------
+
+The `DynamicFunction` class adds functionality for working with an underlying
+global function that corresponds to the parsed identifier name.
+
+```php
+$function = DynamicFunction::parse('some_function');
+```
+
+**exists()** - check if the represented global function exists
+
+```php
+$function->exists();
+```
+
+**call()** - call the global function represented by the parsed function name
+
+```php
+$returnValue = $function->call();
+$returnValue = $function->call(['arg1']);
 ```
 
 Method Chaining
@@ -314,7 +388,7 @@ Methods that do not return an output value can be chained:
 $returnValue = DynamicMethod::parse('aDynamicMethod')
     ->append('last')->if('Method')
     ->mergeRange(1, 2)
-    ->call($this);
+    ->callOn($this);
 ```
 
 Identifier Case Formats
@@ -323,7 +397,7 @@ Identifier Case Formats
 Each class uses a default case format to parse and output identifiers. These
 formats are constants set on the `Tools\CaseFormat` class.
 
-For more information see the [Spicy Identifier Tools][tools] package which
+For more information, see the [Spicy Identifier Tools][tools] package which
 this package includes automatically.
 
 Identifier Class         | Default Case Format            | Example
@@ -338,13 +412,13 @@ To override this default formatting, parse the identifier using one of the
 dedicated methods and/or set the output formatting explicitly:
 
 ```php
-// parses and output with the default case format (camel case)
+// parse and output with the default case format (camel case)
 $identifier = DynamicIdentifier::parse('identifierName');
 
-// parse and output with an explicit case format
+// parse with an explicit case format, output with the default format
 $identifier = DynamicIdentifier::parseFromUnderscore('identifier_name');
 
-// parse with an explicit format, and set a different output format
+// parse with an explicit format, and set an explicit output format
 $identifier = DynamicIdentifier::parseFromUnderscore('identifier_name')
     ->setOutputFormat(CaseFormat::UPPER_CAMEL_CASE);
 ```
@@ -365,6 +439,7 @@ an output format with acronyms:
 
 ```php
 $method->name();    // "xmlHttpRequest"
+
 $method
     ->setOutputFormat(CaseFormat::CAMEL_CASE_WITH_ACRONYMS)
     ->name();       // "XMLHttpRequest"
