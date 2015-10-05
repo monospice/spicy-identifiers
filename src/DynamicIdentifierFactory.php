@@ -14,6 +14,14 @@ use Monospice\SpicyIdentifiers\Tools\Parser;
 trait DynamicIdentifierFactory
 {
     // Inherit Doc from Interfaces\DynamicIdentifier
+    public static function load($identifierName)
+    {
+        $parserClass = get_called_class();
+
+        return new $parserClass([$identifierName]);
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
     public static function parse($identifierName)
     {
         $parserClass = get_called_class();

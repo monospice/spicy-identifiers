@@ -43,6 +43,31 @@ interface DynamicIdentifier extends ArrayAccess, Countable
     public function getOutputCase();
 
     /**
+     * Load an identifier name without parsing it into component parts
+     *
+     * @api
+     *
+     * @param string $name The identifier name string to load
+     *
+     * @return DynamicIdentifier An instance of DynamicIdentifier containing the
+     * loaded identifier name
+     */
+    public static function load($name);
+
+    /**
+     * Break an identifier name into an array using the default Case Format
+     * specified on the class
+     *
+     * @api
+     *
+     * @param string $name The identifier name string to parse
+     *
+     * @return DynamicIdentifier An instance of DynamicIdentifier containing the
+     * parsed identifier name data
+     */
+    public static function parse($name);
+
+    /**
      * Break an identifier name into an array based on uppercase words in
      * camel case
      *

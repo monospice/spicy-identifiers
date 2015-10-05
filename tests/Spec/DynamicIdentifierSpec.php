@@ -92,6 +92,12 @@ class DynamicIdentifierSpec extends ObjectBehavior
         $this->has(999)->shouldReturn(false);
     }
 
+    function it_loads_an_identifier_name_without_parsing_out_parts()
+    {
+        $this->beConstructedThrough('load', ['anIdentifierName']);
+        $this->parts()->shouldReturn(['anIdentifierName']);
+    }
+
     function it_parses_an_identifier_name_into_an_array_from_camel_case()
     {
         $this->beConstructedThrough('parseFromCamelCase', ['anIdentifierName']);
