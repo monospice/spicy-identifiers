@@ -28,7 +28,7 @@ public function __call($methodCalled, array $arguments)
 
     // Check if the method name starts and ends with certain strings
     if ($method->startsWith('call') && $method->endsWith('Method')) {
-        $method->replace(0, 'get')->replace(2, 'Variable');
+        $method->replace(0, 'get')->replace(3, 'Variable');
         // The dynamic method name is now "getSomeDynamicVariable"
     }
 
