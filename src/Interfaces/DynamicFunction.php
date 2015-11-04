@@ -61,7 +61,7 @@ interface DynamicFunction extends DynamicIdentifier
      *
      * @param string|null $message The customizable exception message
      *
-     * @return void
+     * @return $this
      *
      * @throws \BadFunctionCallException If the function represented by this
      * instance does not exist

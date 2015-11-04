@@ -100,7 +100,7 @@ interface DynamicMethod extends DynamicIdentifier
      * @param mixed       $context The context to check in for method existance
      * @param string|null $message The customizable exception message
      *
-     * @return void
+     * @return $this
      *
      * @throws \BadMethodCallException If the method represented by this
      * instance does not exist

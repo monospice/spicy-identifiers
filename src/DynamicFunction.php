@@ -50,5 +50,7 @@ class DynamicFunction extends DynamicIdentifier implements Interfaces\DynamicFun
         if (! $this->exists()) {
             $this->throwException($message);
         }
+
+        return $this;
     }
 }

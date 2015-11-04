@@ -80,6 +80,8 @@ class DynamicMethod extends DynamicIdentifier implements Interfaces\DynamicMetho
         if (! $this->existsOn($context)) {
             $this->throwException($message);
         }
+
+        return $this;
     }
 
     /**
