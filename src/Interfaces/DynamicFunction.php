@@ -37,4 +37,34 @@ interface DynamicFunction extends DynamicIdentifier
      * @return mixed The return value of the called function
      */
     public function call(array $arguments = []);
+
+    /**
+     * Throw a BadFunctionCallException. The default exception message assumes
+     * that the exception is thrown because the function doesn't exist
+     *
+     * @api
+     *
+     * @param string|null $message The customizable exception message
+     *
+     * @return void
+     *
+     * @throws \BadFunctionCallException With the given message or a default
+     * message that assumes that the function doesn't exist
+     */
+    public function throwException($message = null);
+
+    /**
+     * Throw a BadFunctionCallException if the function represented by this
+     * instance does not exist
+     *
+     * @api
+     *
+     * @param string|null $message The customizable exception message
+     *
+     * @return void
+     *
+     * @throws \BadFunctionCallException If the function represented by this
+     * instance does not exist
+     */
+    public function throwExceptionIfMissing($message = null);
 }

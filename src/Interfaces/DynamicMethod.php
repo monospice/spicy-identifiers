@@ -75,4 +75,35 @@ interface DynamicMethod extends DynamicIdentifier
      * @return mixed The return value of the called method
      */
     public function forwardStaticCallTo($context, array $arguments = []);
+
+    /**
+     * Throw a BadMethodCallException. The default exception message assumes
+     * that the exception is thrown because the method doesn't exist
+     *
+     * @api
+     *
+     * @param string|null $message The customizable exception message
+     *
+     * @return void
+     *
+     * @throws \BadMethodCallException With the given message or a default
+     * message that assumes that the method doesn't exist
+     */
+    public function throwException($message = null);
+
+    /**
+     * Throw a BadMethodCallException if the method represented by this
+     * instance does not exist
+     *
+     * @api
+     *
+     * @param mixed       $context The context to check in for method existance
+     * @param string|null $message The customizable exception message
+     *
+     * @return void
+     *
+     * @throws \BadMethodCallException If the method represented by this
+     * instance does not exist
+     */
+    public function throwExceptionIfMissingOn($context, $message = null);
 }

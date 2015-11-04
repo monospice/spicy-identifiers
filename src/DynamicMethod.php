@@ -59,6 +59,29 @@ class DynamicMethod extends DynamicIdentifier implements Interfaces\DynamicMetho
         return forward_static_call_array([$context, $methodName], $arguments);
     }
 
+    // Inherit Doc from Interfaces\DynamicMethod
+    public function throwException($message = null)
+    {
+        if ($message === null) {
+            $message = 'The method [' . $this . '] does not exist.';
+        }
+
+        throw new \BadMethodCallException($message);
+    }
+
+    // Inherit Doc from Interfaces\DynamicMethod
+    public function throwExceptionIfMissingOn($context, $message = null)
+    {
+        if ($message === null) {
+            $message = 'The method [' . $this . '] does not exist on ['
+                . static::getClassName($context) . '].';
+        }
+
+        if (! $this->existsOn($context)) {
+            $this->throwException($message);
+        }
+    }
+
     /**
      * Invoke the static method represented by the identifier in the given
      * context
@@ -86,5 +109,21 @@ class DynamicMethod extends DynamicIdentifier implements Interfaces\DynamicMetho
             'Attempted to call non-static method ' . $this->name() .
             ' statically'
         );
+    }
+
+    /**
+     * Get the class name of the provided context
+     *
+     * @param string|object $context The context to get the class name of
+     *
+     * @return string The class name of the provided context
+     */
+    protected static function getClassName($context)
+    {
+        if (is_string($context)) {
+            return $context;
+        }
+
+        return get_class($context);
     }
 }

@@ -46,4 +46,16 @@ class DynamicFunctionSpec extends ObjectBehavior
         $this->beConstructedThrough('parseFromUnderscore', ['strlen']);
         $this->call(['test'])->shouldReturn(4);
     }
+
+    function it_throws_an_exception_when_instructed_to_throw_an_exception()
+    {
+        $this->shouldThrow('\BadFunctionCallException')
+            ->during('throwException');
+    }
+
+    function it_throws_an_exception_if_the_function_does_not_exist()
+    {
+        $this->shouldThrow('\BadFunctionCallException')
+            ->during('throwExceptionIfMissing');
+    }
 }

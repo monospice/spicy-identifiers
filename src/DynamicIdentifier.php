@@ -39,7 +39,7 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
      * @internal
      * @var string
      */
-    protected $outputCase;
+    protected $outputFormat;
 
     /**
      * Create a new DynamicIdentifier instance. Instead of using the constructor,
@@ -56,30 +56,20 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function setOutputCase($outputCaseConstant)
+    public function setOutputFormat($caseFormatConstant)
     {
-        switch ($outputCaseConstant) {
-            case CaseFormat::CAMEL_CASE:
-                // pass-through case
-            case CaseFormat::UNDERSCORE:
-                $this->outputCase = $outputCaseConstant;
-                return $this;
-            default:
-                throw new \InvalidArgumentException(
-                    $outputCaseConstant . ' is not a constant that represents ' .
-                    'a valid output case format'
-                );
-        }
+        $this->outputFormat = $caseFormatConstant;
+        return $this;
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
-    public function getOutputCase()
+    public function getOutputFormat()
     {
-        if ($this->outputCase === null) {
+        if ($this->outputFormat === null) {
             return static::$defaultCase;
         }
 
-        return $this->outputCase;
+        return $this->outputFormat;
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
@@ -103,21 +93,15 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
     {
         if ($partName === null) {
             return array_keys($this->identifierParts);
-        } else {
-            return array_keys($this->identifierParts, $partName);
         }
+
+        return array_keys($this->identifierParts, $partName);
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
     public function getNumParts()
     {
         return count($this->identifierParts);
-    }
-
-    // Inherit Doc from Interfaces\DynamicIdentifier
-    public function has($key)
-    {
-        return isset($this->identifierParts[$key]);
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
@@ -145,8 +129,26 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
     {
         return Formatter::format(
             $this->identifierParts,
-            $this->getOutputCase()
+            $this->getOutputFormat()
         );
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function has($key)
+    {
+        return isset($this->identifierParts[$key]);
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function startsWith($string)
+    {
+        return $this->first() === $string;
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function endsWith($string)
+    {
+        return $this->last() === $string;
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
@@ -302,6 +304,22 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
     }
 
     // Inherit Doc from Interfaces\DynamicIdentifier
+    public function toFunction()
+    {
+        $function = new DynamicFunction($this->parts());
+
+        return $this->applyOutputFormat($function);
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
+    public function toMethod()
+    {
+        $method = new DynamicMethod($this->parts());
+
+        return $this->applyOutputFormat($method);
+    }
+
+    // Inherit Doc from Interfaces\DynamicIdentifier
     public function toArray()
     {
         return $this->parts();
@@ -311,5 +329,24 @@ class DynamicIdentifier implements Interfaces\DynamicIdentifier
     public function __toString()
     {
         return $this->name();
+    }
+
+    /**
+     * Applies the current output case to a DynamicIdentifier if already
+     * explicitly set.
+     *
+     * @param DynamicIdentifier $identifier The DynamicIdentifier instance to
+     * apply the output case to
+     *
+     * @return DynamicIdentifier The DynamicIdentifier instance with the
+     * output case set
+     */
+    protected function applyOutputFormat(DynamicIdentifier $identifier)
+    {
+        if ($this->outputFormat !== null) {
+            $identifier->setOutputFormat($this->outputFormat);
+        }
+
+        return $identifier;
     }
 }

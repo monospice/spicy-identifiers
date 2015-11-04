@@ -92,6 +92,18 @@ class DynamicIdentifierSpec extends ObjectBehavior
         $this->has(999)->shouldReturn(false);
     }
 
+    function it_determines_if_the_identifier_name_starts_with_the_given_part()
+    {
+        $this->startsWith('an')->shouldReturn(true);
+        $this->startsWith('nope')->shouldReturn(false);
+    }
+
+    function it_determines_if_the_identifier_name_ends_with_the_given_part()
+    {
+        $this->endsWith('Name')->shouldReturn(true);
+        $this->endsWith('nope')->shouldReturn(false);
+    }
+
     function it_loads_an_identifier_name_without_parsing_out_parts()
     {
         $this->beConstructedThrough('load', ['anIdentifierName']);
@@ -149,19 +161,19 @@ class DynamicIdentifierSpec extends ObjectBehavior
 
     function it_returns_the_current_output_case()
     {
-        $this->getOutputCase()->shouldReturn(CaseFormat::CAMEL_CASE);
+        $this->getOutputFormat()->shouldReturn(CaseFormat::CAMEL_CASE);
     }
 
     function it_sets_the_default_output_case_using_the_default_case_format()
     {
         $this->beConstructedThrough('parseFromHyphen', ['an-identifier-name']);
-        $this->getOutputCase()->shouldReturn(CaseFormat::CAMEL_CASE);
+        $this->getOutputFormat()->shouldReturn(CaseFormat::CAMEL_CASE);
     }
 
     function it_accepts_a_constant_for_the_output_case_format()
     {
-        $this->setOutputCase(CaseFormat::UNDERSCORE);
-        $this->getOutputCase()->shouldReturn(CaseFormat::UNDERSCORE);
+        $this->setOutputFormat(CaseFormat::UNDERSCORE);
+        $this->getOutputFormat()->shouldReturn(CaseFormat::UNDERSCORE);
     }
 
     function it_adds_an_identifier_part_to_the_end()
@@ -265,7 +277,19 @@ class DynamicIdentifierSpec extends ObjectBehavior
         $this->part(0)->shouldReturn('Identifier');
     }
 
-    function it_provides_an_interface_to_cast_to_an_array()
+    function it_casts_to_a_dynamic_function()
+    {
+        $this->toFunction()
+            ->shouldHaveType('Monospice\SpicyIdentifiers\DynamicFunction');
+    }
+
+    function it_casts_to_a_dynamic_method()
+    {
+        $this->toMethod()
+            ->shouldHaveType('Monospice\SpicyIdentifiers\DynamicMethod');
+    }
+
+    function it_casts_to_an_array()
     {
         $this->toArray()->shouldReturn($this->identifierParts);
     }
@@ -274,12 +298,6 @@ class DynamicIdentifierSpec extends ObjectBehavior
     {
         $this->__toString()->shouldReturn('anIdentifierName');
         $this->name()->shouldReturn((string) $this->getWrappedObject());
-    }
-
-    function it_throws_an_exception_when_trying_to_set_an_invalid_output_case()
-    {
-        $this->shouldThrow('\InvalidArgumentException')
-            ->during('setOutputCase', ['not a valid output case']);
     }
 
     function it_throws_an_exception_when_replacing_a_part_that_does_not_exist()

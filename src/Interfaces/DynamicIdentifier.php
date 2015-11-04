@@ -21,7 +21,7 @@ interface DynamicIdentifier extends ArrayAccess, Countable
      *
      * @api
      *
-     * @param string $outputCaseConstant The string constant representing an
+     * @param string $caseFormatConstant The string constant representing an
      * output case format
      *
      * @return DynamicIdentifier The current DynamicIdentifier instance for
@@ -30,7 +30,7 @@ interface DynamicIdentifier extends ArrayAccess, Countable
      * @throws \InvalidArgumentException If not provided with a valid output
      * case format
      */
-    public function setOutputCase($outputCaseConstant);
+    public function setOutputFormat($caseFormatConstant);
 
     /**
      * Get the output case format that will be used for identifiers that build
@@ -40,7 +40,7 @@ interface DynamicIdentifier extends ArrayAccess, Countable
      *
      * @return string The string constant representing an output case format
      */
-    public function getOutputCase();
+    public function getOutputFormat();
 
     /**
      * Load an identifier name without parsing it into component parts
@@ -192,19 +192,6 @@ interface DynamicIdentifier extends ArrayAccess, Countable
     public function getNumParts();
 
     /**
-     * Determines if the identifier name contains a part corresponding to
-     * the given index
-     *
-     * @api
-     *
-     * @param int $key The index of the identifier  name part to check
-     *
-     * @return bool True if the identifier  name parts array contains the
-     * corresponding part
-     */
-    public function has($key);
-
-    /**
      * Get the string representation of the parsed identifier
      *
      * @api
@@ -228,6 +215,39 @@ interface DynamicIdentifier extends ArrayAccess, Countable
      * method chaining
      */
     public function mergeRange($start, $end = null);
+
+    /**
+     * Determines if the identifier name contains a part corresponding to
+     * the given index
+     *
+     * @api
+     *
+     * @param int $key The index of the identifier  name part to check
+     *
+     * @return bool True if the identifier name parts array contains the
+     * corresponding part
+     */
+    public function has($key);
+
+    /**
+     * Determine if the identifier name starts with the specified part string
+     *
+     * @param string $startsWith The string that the first part should equal
+     *
+     * @return bool True if the first identifier part equals the specified
+     * string
+     */
+    public function startsWith($string);
+
+    /**
+     * Determine if the identifier name ends with the specified part string
+     *
+     * @param string $startsWith The string that the last part should equal
+     *
+     * @return bool True if the last identifier part equals the specified
+     * string
+     */
+    public function endsWith($string);
 
     /**
      * Add an identifier part to the end
@@ -325,6 +345,22 @@ interface DynamicIdentifier extends ArrayAccess, Countable
      * specified index
      */
     public function replace($key, $renameTo);
+
+    /**
+     * Convert this identifier instance to a DynamicFunction instance
+     *
+     * @return DynamicFunction The new DynamicFunction instance of the current
+     * identifier
+     */
+    public function toFunction();
+
+    /**
+     * Convert this identifier instance to a DynamicMethod instance
+     *
+     * @return DynamicMethod The new DynamicMethod instance of the current
+     * identifier
+     */
+    public function toMethod();
 
     /**
      * Get the array representation of this object as an array of identifier

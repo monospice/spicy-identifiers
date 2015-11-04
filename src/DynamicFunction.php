@@ -33,4 +33,22 @@ class DynamicFunction extends DynamicIdentifier implements Interfaces\DynamicFun
     {
         return call_user_func_array($this->name(), $arguments);
     }
+
+    // Inherit Doc from Interfaces\DynamicFunction
+    public function throwException($message = null)
+    {
+        if ($message === null) {
+            $message = 'The function [' . $this . '] does not exist.';
+        }
+
+        throw new \BadFunctionCallException($message);
+    }
+
+    // Inherit Doc from Interfaces\DynamicFunction
+    public function throwExceptionIfMissing($message = null)
+    {
+        if (! $this->exists()) {
+            $this->throwException($message);
+        }
+    }
 }
