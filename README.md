@@ -26,8 +26,11 @@ public function __call($methodCalled, array $arguments)
     // Use Spicy Identifiers to work with the dynamic method
     $method = DynamicMethod::parse($methodCalled);
 
-    $method->replace(0, 'get')->replace(2, 'Variable');
-    // The dynamic method name is now "getSomeDynamicVariable"
+    // Check if the method name starts and ends with certain strings
+    if ($method->startsWith('call') && $method->endsWith('Method')) {
+        $method->replace(0, 'get')->replace(2, 'Variable');
+        // The dynamic method name is now "getSomeDynamicVariable"
+    }
 
     // Alert the developer if they called a method that doesn't exist
     $method->throwExceptionIfMissingOn($this);
