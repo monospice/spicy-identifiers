@@ -29,18 +29,14 @@ public function __call($methodCalled, array $arguments)
     $method->replace(0, 'get')->replace(2, 'Variable');
     // The dynamic method name is now "getSomeDynamicVariable"
 
-    // Check if the method exists in this class
-    if (! $method->existsOn($this)) {
-        throw new \BadMethodCallException($methodCalled . ' does not exist');
-    }
+    // Alert the developer if they called a method that doesn't exist
+    $method->throwExceptionIfMissingOn($this);
 
     // Check that the method includes the word "Dynamic" in the name,
     // then call the method represented by the name and return that value
     if ($method->has(1) && $method[1] === 'Dynamic') {
         return $method->callOn($this, $arguments);
     }
-
-    throw new \BadMethodCallException($methodCalled . ' is not supported');
 }
 ```
 
@@ -185,6 +181,20 @@ $identifier->keys();                    // [0, 1, 2]
 $identifier->keys('Name');              // [2]
 ```
 
+**getNumParts()** - get the number of identifier parts
+
+```php
+$identifier->getNumParts();             // 3
+```
+
+Alternatively, use PHP's count() function to get the number of identifier parts:
+
+```php
+count($identifier);                     // 3
+```
+
+### Checking Identifer Parts
+
 **has()** - check if the identifier contains a part at the specified index
 
 ```php
@@ -197,16 +207,16 @@ One may use array access for the above as well:
 isset($identifier[1]);                  // true
 ```
 
-**getNumParts()** - get the number of identifier parts
+**startsWith()** - check if the identifier starts with the specified string
 
 ```php
-$identifier->getNumParts();             // 3
+$identifier->startsWith('get');
 ```
 
-Alternatively, use PHP's count() function to get the number of identifier parts:
+**endsWith()** - check if the identifier ends with the specified string
 
 ```php
-count($identifier);                     // 3
+$identifier->endsWith('Something');
 ```
 
 ### Adding Parts
@@ -333,11 +343,11 @@ $returnValue = $method->callOn('Namespace\SomeClass', ['arg1']);
 the given context
 
 This method is similar to `callOn()`, but it permits access to private and
-protected methods that cannot be called directly. `invokeOn()` is intented for
-DynamicMethod instances used inside a class that could otherwise normally access
-its private and protected members directly. One should consider this use
-carefully before choosing this method, and always use `callOn()` for public
-methods.
+protected methods that the `DynamicMethod` instance cannot call directly.
+`invokeOn()` is intented for cases where `DynamicMethod` is used inside a
+class that could otherwise normally access its private and protected members
+directly. One should consider this use carefully before choosing this method,
+and always use `callOn()` for public methods.
 
 ```php
 $returnValue = $method->invokeOn($someInstance);
@@ -354,6 +364,32 @@ name in the given context
 ```php
 $returnValue = $method->forwardStaticCallTo('Namespace\SomeClass');
 $returnValue = $method->forwardStaticCallTo('SomeClass', ['arg1', 'arg2']);
+```
+
+**throwException()** - throw a BadMethodCallException. The default exception
+message assumes that the exception is thrown becuase the method does not exist
+
+```php
+$method->throwException();
+```
+
+One may specify the exception message in the first parameter:
+
+```php
+$method->throwException('A custom exception message');
+```
+
+**throwExceptionIfMissingOn()** - throw a BadMethodCallException if the method
+does not exist in the given context
+
+```php
+$method->throwExceptionIfMissingOn($someObject);
+```
+
+One may specify the exception message in the first parameter:
+
+```php
+$method->throwExceptionIfMissingOn($someObject, 'A custom exception message');
 ```
 
 Dynamic Functions
@@ -377,6 +413,32 @@ $function->exists();
 ```php
 $returnValue = $function->call();
 $returnValue = $function->call(['arg1']);
+```
+
+**throwException()** - throw a BadFunctionCallException. The default exception
+message assumes that the exception is thrown becuase the function does not exist
+
+```php
+$function->throwException();
+```
+
+One may specify the exception message in the first parameter:
+
+```php
+$function->throwException('A custom exception message');
+```
+
+**throwExceptionIfMissing()** - throw a BadFunctionCallException if the function
+does not exist
+
+```php
+$function->throwExceptionIfMissing();
+```
+
+One may specify the exception message in the first parameter:
+
+```php
+$function->throwExceptionIfMissing('A custom exception message');
 ```
 
 Method Chaining
