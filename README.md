@@ -444,6 +444,37 @@ One may specify the exception message in the first parameter:
 $function->throwExceptionIfMissing('A custom exception message');
 ```
 
+Changing Dynamic Identifier Types
+---------------------------------
+
+One may obtain a particular identifer type from any of the Dynamic Identifier
+classes in this package. For example, a developer can get the `DynamicVariable`
+representation of a `DynamicMethod` with the same identifier name, but with
+methods specific to variables:
+
+```php
+$method = DynamicMethod::parse('anIdentifierName');
+$method->name();                   // 'anIdentifierName'
+
+$variable = $method->toVariable();
+get_class($variable);              // Monospice\SpicyIdentifiers\DynamicVariable
+$variable->name();                 // 'anIdentifierName'
+```
+
+Note that this functionality does not cast the original object, but returns a
+new instance of the corresponding class. Because of this, remember to assign
+the returned object to a variable if you plan to use the converted instance
+later in the code. This design encourages proper variable names for each type.
+
+The available conversions are:
+
+```php
+$method = $identifier->toMethod();      // DynamicMethod
+$variable = $identifier->toVariable();  // DynamicVariable
+$class = $identifier->toClass();        // DynamicClass
+$function = $identifier->toFunction();  // DynamicFunction
+```
+
 Method Chaining
 ---------------
 
@@ -451,7 +482,7 @@ Methods that do not return an output value can be chained:
 
 ```php
 $returnValue = DynamicMethod::parse('aDynamicMethod')
-    ->append('last')->if('Method')
+    ->append('last')
     ->mergeRange(1, 2)
     ->callOn($this);
 ```
@@ -462,8 +493,9 @@ Identifier Case Formats
 Each class uses a default case format to parse and output identifiers. These
 formats are constants set on the `Tools\CaseFormat` class.
 
-For more information, see the [Spicy Identifier Tools][tools] package which
-this package includes automatically.
+For more information about the supported case formats, see the
+[Spicy Identifier Tools][tools] package which this package includes
+automatically.
 
 Identifier Class         | Default Case Format            | Example
 ------------------------ | ------------------------------ | ------------------
