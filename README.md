@@ -37,7 +37,7 @@ public function __call($methodCalled, array $arguments)
 
     // Check that the method includes the word "Dynamic" in the name,
     // then call the method represented by the name and return that value
-    if ($method->has(1) && $method[1] === 'Dynamic') {
+    if ($method->has(2) && $method[2] === 'Dynamic') {
         return $method->callOn($this, $arguments);
     }
 }
