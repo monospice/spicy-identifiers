@@ -160,6 +160,7 @@ a specific format:
 - **parseFromCamelCase()** - Identifiers like: `anIdentifierName`
 - **parseFromCamelCaseExtended()** - Identifiers like: `änÏdentifierNáme`
 - **parseFromUnderscore()** - Identifiers like: `an_identifier_name`
+- **parseFromSnakeCase()** - Alias for **parseFromUnderscore()**
 - **parseFromHyphen()** - Identifiers like:  `an-identifier-name`
 - **parseFromMixedCase()** - Identifiers like: `aMixed_case-identifier`
 

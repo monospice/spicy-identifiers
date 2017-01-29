@@ -124,6 +124,18 @@ trait MakesDynamicIdentifiers
     }
 
     /**
+     * An alias for self::parseFromUnderscore()
+     *
+     * @param string $identifier The identifier name string to parse
+     *
+     * @return self An instance of this class with the parsed identifier parts
+     */
+    public static function parseFromSnakeCase($identifier)
+    {
+        return static::parseFromUnderscore($identifier);
+    }
+
+    /**
      * Make an instance by breaking an identifier into parts based on words
      * seperated by hyphens
      *
