@@ -129,12 +129,20 @@ class DynamicIdentifierSpec extends ObjectBehavior
         $this->endsWith('NAME', true)->shouldReturn(false);
     }
 
-    function it_loads_an_identifier_without_parsing_out_parts()
+    function it_loads_an_identifier_without_parsing_the_parts()
     {
-        $this->beConstructedThrough('load', [ 'anIdentifierName' ]);
+        $this->beConstructedThrough('from', [ 'anIdentifierName' ]);
 
         $this->shouldHaveType(DynamicIdentifier::class);
         $this->parts()->shouldReturn([ 'anIdentifierName' ]);
+    }
+
+    function it_loads_identifier_parts_without_parsing_them()
+    {
+        $this->beConstructedThrough('fromParts', [ $this->identifierParts ]);
+
+        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->parts()->shouldReturn($this->identifierParts);
     }
 
     function it_parses_an_identifier_from_camel_case()
@@ -148,7 +156,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
         $this->parts()->shouldReturn([ 'an', 'Identifier', 'Name' ]);
     }
 
-    function it_parses_an_identifier_from_extended_camel()
+    function it_parses_an_identifier_from_extended_camel_case()
     {
         $this->beConstructedThrough(
             'parseFromCamelCaseExtended',

@@ -169,14 +169,26 @@ identifiers, [see below](#identifier-case-formats).
 Loading an Identifier
 ---------------------
 
-Sometimes an identifier may not need to be parsed into each part, such as when
-using this package to call dynamic methods. To improve performance in these
-cases, use the `::load()` factory method to load the whole identifier string
-without invoking the parser.
+Sometimes we may wish to use the dynamic features of the classes in this
+package, but we don't need to parse the identifier string into its component
+parts. In these cases, we can avoid invoking the parser by using the `::from()`
+factory method to simply create an instance for the identifier string to improve
+performance.
 
 ```php
-$method = DynamicMethod::load('aMethodName');
+$method = DynamicMethod::from('aMethodName');
 $method->parts(); // array('aMethodName')
+
+$returnValue = $method->callOn($this);
+```
+
+Similarly, in some cases we may already know or have the set of identifier parts
+that we'd like to use. We can call the `::fromParts()` factory method to create
+an instance for the represented identifier:
+
+```php
+$method = DynamicMethod::fromParts(['a', 'method', 'name']);
+$method->parts(); // array('a', 'method', 'name')
 
 $returnValue = $method->callOn($this);
 ```

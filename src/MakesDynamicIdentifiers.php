@@ -17,17 +17,57 @@ use Monospice\SpicyIdentifiers\Tools\Parser;
 trait MakesDynamicIdentifiers
 {
     /**
-     * Make an instance and load the specified identifier as a single part
+     * Make an instance and use the specified identifier as a single part
      * without parsing it
+     *
+     * Sometimes we may wish to use the dynamic features of the classes in this
+     * package, but we don't need to parse the identifier string into its
+     * component parts. In these cases, we can use this method to simply create
+     * an instance for the identifier string without parsing it to improve
+     * performance.
+     *
+     * @param string $identifier The identifier name string to use
+     *
+     * @return self An instance of this class with one identifier part that
+     * equals the provided identifier string
+     */
+    public static function from($identifier)
+    {
+        return new static([ $identifier ]);
+    }
+
+    /**
+     * Make an instance with the provided identifier parts without parsing
+     * them
+     *
+     * Sometimes we may wish to use the dynamic features of the classes in this
+     * package, but we already have a set of identifier parts that we'd like to
+     * use. In these cases, we can use this method to simply create an instance
+     * for the provided parts without parsing them to improve performance.
+     *
+     * @param array $identifierParts The series of strings that represent the
+     * identifier when combined
+     *
+     * @return self An instance of this class for the provided identifier parts
+     */
+    public static function fromParts(array $identifierParts)
+    {
+        return new static($identifierParts);
+    }
+
+    /**
+     * DEPRECATED: Use self::from() instead
      *
      * @param string $identifier The identifier name string to load
      *
      * @return self An instance of this class with one identifier part that
      * equals the provided identifier string
+     *
+     * @deprecated Use self::from() instead
      */
     public static function load($identifier)
     {
-        return new static([ $identifier ]);
+        return static::from($identifier);
     }
 
     /**
