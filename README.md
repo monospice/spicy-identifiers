@@ -6,16 +6,31 @@ Spicy Identifiers
 **An easy way to parse and manipulate identifier names, such as dynamic method
 names.**
 
-This package is helpful when working with dynamic identifier names such
-as dynamically accessed methods and variables/properties.
+This package improves the experience of working with dynamic identifier names
+such as dynamically accessed methods and variables/properties. It also eases
+conversion between identifer case formats like `camelCase` and `snake_case`.
 
-**Warning:** This package is under heavy development and should be considered
-**incomplete** and **unstable**.
+For instance, imagine that we have a configuration file that contains an array
+of configuration directives and a class that consumes those directives. If we
+write the configuration keys in `snake_case`, but the class uses `camelCase`
+to define corresponding setter methods, we can use this package to bridge the
+two more easily. See below for an example.
 
-Simple Example
---------------
+**Note:** The current stable version only includes support for working with
+dynamic methods and functions. Support for classes, variables, and properties
+is under development.
+
+Simple Examples
+---------------
+
+Developers often [use PHP's magic methods to dynamically overload class
+methods](http://php.net/manual/en/language.oop5.overloading.php#object.call)
+for more flexible functionality. This package can simplify the work needed
+to handle the dynamic method call:
 
 ```php
+<?php
+
 // Call a dynamic method:
 $someClass->callSomeDynamicMethod('some argument');
 
@@ -43,6 +58,40 @@ public function __call($methodCalled, array $arguments)
 }
 ```
 
+Consider another example with a class that consumes configuration directives
+stored as an array. The configuration keys are written in `snake_case`, but
+the class uses `camelCase` to define corresponding setter methods. This package
+makes it easy to load the configuration:
+
+```php
+<?php
+
+$config = [
+    'config_directive_1' => 'some value',
+    'config_directive_2' => 'some value',
+    ...
+];
+
+class UsesConfig
+{
+    public function __construct(array $config)
+    {
+        foreach ($config as $option => $value) {
+            DynamicMethod::parse($option)
+                ->prepend('set')
+                ->throwExceptionIfMissingOn($this, 'Invalid option: ' . $option)
+                ->callOn($this, [ $value ]); // calls setConfigDirectiveN()
+        }
+    }
+
+    public function setConfigDirective1($value) { ... }
+
+    public function setConfigDirective2($value) { ... }
+
+    ...
+}
+```
+
 Installation
 ------------
 
@@ -50,7 +99,7 @@ Installation
 $ composer require monospice/spicy-identifiers
 ```
 
-If you're autoloading classes (hopefully):
+We'll need to make sure to import the classes we want to use:
 
 ```php
 use Monospice\SpicyIdentifiers\DynamicVariable;
@@ -74,7 +123,7 @@ provides no additional functionality
 - `DynamicMethod`: Provides methods and defaults that expedite the process of
 working with class methods
 - `DynamicFunction`: Provides methods and defaults that expedite the process of
-working with global functions
+working with standard functions
 - `DynamicVariable`: Provides methods and defaults that expedite the process of
 working with variables
 - `DynamicClass`: Provides methods and defaults that expedite the process of
@@ -88,14 +137,15 @@ the package's factory methods to parse it into the object:
 
 ```php
 $method = DynamicMethod::parse('aMethodName');
-$someVar = DynamicVariable::parse('aVariableName');
+$function = DynamicFunction::parse('a_function_name');
+$variable = DynamicVariable::parse('aVariableName');
 $class = DynamicClass::parse('AClassName');
 
 $method->parts(); // array('a', 'Method', 'Name')
 ```
 
-The `::parse()` method uses the default case format for the identifer type
-represented by each of the package's classes. To parse an identifier in a
+The `::parse()` factory method uses the default case format for the identifer
+type represented by each of the package's classes. To parse an identifier in a
 specific format, use the respective parsing method:
 
 ```php
@@ -103,7 +153,18 @@ $method = DynamicMethod::parseFromUnderscore('a_method_name');
 $method->parts(); // array('a', 'method', 'name')
 ```
 
-More information about identifier case formats below.
+In addition to `::parse()`, we can use the following factory methods from any
+of the `DynamicIdentifier` subclasses in this package to parse identifiers in
+a specific format:
+
+- **parseFromCamelCase()** - Identifiers like: `anIdentifierName`
+- **parseFromCamelCaseExtended()** - Identifiers like: `änÏdentifierNáme`
+- **parseFromUnderscore()** - Identifiers like: `an_identifier_name`
+- **parseFromHyphen()** - Identifiers like:  `an-identifier-name`
+- **parseFromMixedCase()** - Identifiers like: `aMixed_case-identifier`
+
+For more information about identifier case formats and mixed-case or extended ASCII
+identifiers, [see below](#identifier-case-formats).
 
 Loading an Identifier
 ---------------------
@@ -123,14 +184,14 @@ $returnValue = $method->callOn($this);
 Identifier Manipulation
 -----------------------
 
-After parsing an identifier, one can use this package to manipulate the parts.
-Let's use this DynamicIdentifier instance for the following examples:
+After parsing an identifier, we can use this package to manipulate the parts.
+Let's use this `DynamicIdentifier` instance for the following examples:
 
 ```php
 $identifier = DynamicIdentifier::parse('anIdentifierName');
 ```
 
-At any time, you may retrieve the current identifier name:
+At any time, we can retrieve the current identifier name:
 
 **name()** - get the string representation of the entire identifier name
 
@@ -138,7 +199,7 @@ At any time, you may retrieve the current identifier name:
 $identifier->name();                    // "anIdentifierName"
 ```
 
-Alternatively, you may cast the dynamic identifer instance to a string:
+Alternatively, we can cast the dynamic identifer instance to a string:
 
 ```php
 echo $identifier;                       // "anIdentifierName"
@@ -165,6 +226,9 @@ Alternatively, use array access to get the value:
 $identifier[1];                         // "Identifier"
 ```
 
+Note that the array of parts is zero-based, so the first part corresponds to
+the index `0`.
+
 **first()** - get the value of the first identifier part
 
 ```php
@@ -181,13 +245,27 @@ $identifier->last();                    // "Name"
 
 ```php
 $identifier->keys();                    // [0, 1, 2]
+```
+
+We can pass a string to the `keys()` method to get an array of indices with
+parts that match the value:
+
+```php
 $identifier->keys('Name');              // [2]
+```
+
+Note that `keys()` performs a case-insensitive comparison by default. To match
+the exact case, set the second parameter to `true`:
+
+```php
+$identifier->keys('NAME', true);        // [ ]
 ```
 
 **getNumParts()** - get the number of identifier parts
 
 ```php
 $identifier->getNumParts();             // 3
+$identifier->count();                   // an alias for getNumParts()
 ```
 
 Alternatively, use PHP's count() function to get the number of identifier parts:
@@ -213,13 +291,22 @@ isset($identifier[1]);                  // true
 **startsWith()** - check if the identifier starts with the specified string
 
 ```php
-$identifier->startsWith('get');
+$identifier->startsWith('an');          // true
+$identifier->startsWith('identifier');  // false
 ```
 
 **endsWith()** - check if the identifier ends with the specified string
 
 ```php
-$identifier->endsWith('Something');
+$identifier->endsWith('name');          // true
+$identifier->endsWith('identifier');    // false
+```
+
+Note that `startsWith()` and `endsWith()` perform case-insensitive comparisons
+by default. To match the exact case, set the second parameter to `true`:
+
+```php
+$identifier->endsWith('NAME', true);    // false
 ```
 
 ### Adding Parts
@@ -304,9 +391,8 @@ If one does not specify an ending position, any remaining parts after the
 starting position will be merged.
 
 ```php
-$identifier->mergeRange(1)->parts();    // array(
-                                        //     0 => "an",
-                                        //     1 => "IdentifierName"
+$identifier->mergeRange(0)->parts();    // array(
+                                        //     0 => "anIdentifierName"
                                         // )
 ```
 
@@ -324,7 +410,8 @@ $method = DynamicMethod::parse('someMethod');
 context
 
 ```php
-$method->existsOn('SomeClass');
+$method->existsOn('Namespace\SomeClass');
+$method->existsOn(SomeClass::class);
 $method->existsOn($someInstance);
 $method->existsOn($this);
 ```
@@ -342,34 +429,34 @@ $returnValue = $method->callOn('Namespace\SomeClass');
 $returnValue = $method->callOn('Namespace\SomeClass', ['arg1']);
 ```
 
-**invokeOn()** - invokes the method represented by the parsed method name in
-the given context
+**callFromScopeOn()** - call the method represented by the parsed method name in
+the given context from the scope of that context
 
 This method is similar to `callOn()`, but it permits access to private and
 protected methods that the `DynamicMethod` instance cannot call directly.
-`invokeOn()` is intented for cases where `DynamicMethod` is used inside a
-class that could otherwise normally access its private and protected members
+`callFromScopeOn()` is intented for cases where `DynamicMethod` is used inside
+a class that could otherwise normally access its private and protected members
 directly. One should consider this use carefully before choosing this method,
 and always use `callOn()` for public methods.
 
 ```php
-$returnValue = $method->invokeOn($someInstance);
-$returnValue = $method->invokeOn($this, ['arg1', 'arg2']);
+$returnValue = $method->callFromScopeOn($someInstance);
+$returnValue = $method->callFromScopeOn($this, ['arg1', 'arg2']);
 
 // Static Methods
-$returnValue = $method->invokeOn('Namespace\SomeClass');
-$returnValue = $method->invokeOn('Namespace\SomeClass', ['arg1']);
+$returnValue = $method->callFromScopeOn('Namespace\SomeClass');
+$returnValue = $method->callFromScopeOn('Namespace\SomeClass', ['arg1']);
 ```
 
-**forwardStaticCallTo()** - forward the static method represented by the parsed method
-name in the given context
+**forwardStaticCallTo()** - forward the call to the static method represented
+by the parsed method name in the given context for late static binding
 
 ```php
 $returnValue = $method->forwardStaticCallTo('Namespace\SomeClass');
 $returnValue = $method->forwardStaticCallTo('SomeClass', ['arg1', 'arg2']);
 ```
 
-**throwException()** - throw a BadMethodCallException. The default exception
+**throwException()** - throw a `BadMethodCallException`. The default exception
 message assumes that the exception is thrown becuase the method does not exist
 
 ```php
@@ -382,14 +469,15 @@ One may specify the exception message in the first parameter:
 $method->throwException('A custom exception message');
 ```
 
-**throwExceptionIfMissingOn()** - throw a BadMethodCallException if the method
+**throwExceptionIfMissingOn()** - throw a `BadMethodCallException` if the method
 does not exist in the given context
 
 ```php
 $method->throwExceptionIfMissingOn($someObject);
+$method->throwExceptionIfMissingOn('Namespace\SomeClass');
 ```
 
-One may specify the exception message in the first parameter:
+One may specify the exception message in the second parameter:
 
 ```php
 $method->throwExceptionIfMissingOn($someObject, 'A custom exception message');
@@ -399,26 +487,26 @@ Dynamic Functions
 -----------------
 
 The `DynamicFunction` class adds functionality for working with an underlying
-global function that corresponds to the parsed identifier name.
+standard function that corresponds to the parsed identifier name.
 
 ```php
 $function = DynamicFunction::parse('some_function');
 ```
 
-**exists()** - check if the represented global function exists
+**exists()** - check if the represented function exists
 
 ```php
 $function->exists();
 ```
 
-**call()** - call the global function represented by the parsed function name
+**call()** - call the function represented by the parsed function name
 
 ```php
 $returnValue = $function->call();
 $returnValue = $function->call(['arg1']);
 ```
 
-**throwException()** - throw a BadFunctionCallException. The default exception
+**throwException()** - throw a `BadFunctionCallException`. The default exception
 message assumes that the exception is thrown becuase the function does not exist
 
 ```php
@@ -431,8 +519,8 @@ One may specify the exception message in the first parameter:
 $function->throwException('A custom exception message');
 ```
 
-**throwExceptionIfMissing()** - throw a BadFunctionCallException if the function
-does not exist
+**throwExceptionIfMissing()** - throw a `BadFunctionCallException` if the
+function does not exist
 
 ```php
 $function->throwExceptionIfMissing();
@@ -447,7 +535,7 @@ $function->throwExceptionIfMissing('A custom exception message');
 Changing Dynamic Identifier Types
 ---------------------------------
 
-One may obtain a particular identifer type from any of the Dynamic Identifier
+We can obtain a particular identifer type from any of the Dynamic Identifier
 classes in this package. For example, a developer can get the `DynamicVariable`
 representation of a `DynamicMethod` with the same identifier name, but with
 methods specific to variables:
@@ -459,6 +547,7 @@ $method->name();                   // 'anIdentifierName'
 $variable = $method->toVariable();
 get_class($variable);              // Monospice\SpicyIdentifiers\DynamicVariable
 $variable->name();                 // 'anIdentifierName'
+$variable->value();                // the value of the corresponding variable
 ```
 
 Note that this functionality does not cast the original object, but returns a
@@ -531,8 +620,8 @@ $method = DynamicMethod::parse('XMLHttpRequest')
 $method->parts();   // array('XML', 'Http', 'Request');
 ```
 
-However, the output methods will not preserve these acronyms unless one sets
-an output format with acronyms:
+However, the output methods will not preserve these acronyms unless we set
+an output format that preserves acronyms:
 
 ```php
 $method->name();    // "xmlHttpRequest"

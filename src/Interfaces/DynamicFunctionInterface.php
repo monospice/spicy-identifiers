@@ -6,33 +6,27 @@ namespace Monospice\SpicyIdentifiers\Interfaces;
  * Parses and manipulates function names. Useful when working with dynamic
  * functions
  *
- * @author Cy Rossignol <cy.rossignol@yahoo.com>
+ * For class methods, use an instance of DynamicMethodInterface instead.
+ *
+ * @category Package
+ * @package  Monospice\SpicyIdentifiers
+ * @author   Cy Rossignol <cy@rossignols.me>
+ * @license  See LICENSE file
+ * @link     https://github.com/monospice/spicy-identifiers
  */
-interface DynamicFunction extends DynamicIdentifier
+interface DynamicFunctionInterface extends DynamicIdentifierInterface
 {
     /**
-     * Check if the function represented by the curent DynamicFunction instance
-     * exists
+     * Check if the function represented by the current instance exists
      *
-     * @api
-     * @see function_exists()
-     * @link http://php.net/manual/en/function.function-exists.php
-     *
-     * @param mixed $context The context to check in
-     *
-     * return bool True if the function exists in the given context
+     * @return bool True if the function exists
      */
     public function exists();
 
     /**
-     * Call the function represented by the current DynamicFunction instance
+     * Call the function represented by the current instance
      *
-     * @api
-     * @see call_user_func_array()
-     * @link http://php.net/manual/en/function.call-user-func-array.php
-     *
-     * @param array $arguments The array of arguments to pass to the called
-     * function
+     * @param array $arguments The arguments to pass to the called function
      *
      * @return mixed The return value of the called function
      */
@@ -40,9 +34,7 @@ interface DynamicFunction extends DynamicIdentifier
 
     /**
      * Throw a BadFunctionCallException. The default exception message assumes
-     * that the exception is thrown because the function doesn't exist
-     *
-     * @api
+     * that we throw the exception because it doesn't exist
      *
      * @param string|null $message The customizable exception message
      *
@@ -57,11 +49,9 @@ interface DynamicFunction extends DynamicIdentifier
      * Throw a BadFunctionCallException if the function represented by this
      * instance does not exist
      *
-     * @api
-     *
      * @param string|null $message The customizable exception message
      *
-     * @return $this
+     * @return $this The current instance of this class for method chaining
      *
      * @throws \BadFunctionCallException If the function represented by this
      * instance does not exist

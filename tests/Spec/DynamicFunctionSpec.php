@@ -2,11 +2,11 @@
 
 namespace Spec\Monospice\SpicyIdentifiers;
 
+use BadFunctionCallException;
+use Monospice\SpicyIdentifiers\DynamicFunction;
+use Monospice\SpicyIdentifiers\DynamicIdentifier;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-
-use Monospice\SpicyIdentifiers\Tools\CaseFormat;
-use Monospice\SpicyIdentifiers\DynamicFunction;
 
 class DynamicFunctionSpec extends ObjectBehavior
 {
@@ -19,43 +19,46 @@ class DynamicFunctionSpec extends ObjectBehavior
 
     function let()
     {
-        $this->identifierParts = ['name'];
+        $this->identifierParts = [ 'name' ];
         $this->beConstructedWith($this->identifierParts);
     }
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicFunction');
-        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
+        $this->shouldHaveType(DynamicFunction::class);
+        $this->shouldHaveType(DynamicIdentifier::class);
     }
 
     function it_determines_if_the_function_exists()
     {
-        $this->beConstructedThrough('parseFromUnderscore', ['strlen']);
+        $this->beConstructedThrough('parseFromUnderscore', [ 'strlen' ]);
+
         $this->exists()->shouldReturn(true);
     }
 
     function it_determines_if_the_function_does_not_exist()
     {
-        $this->beConstructedThrough('parseFromUnderscore', ['not_function']);
+        $this->beConstructedThrough('parseFromUnderscore', [ 'not_function' ]);
+
         $this->exists()->shouldReturn(false);
     }
 
-    function it_calls_the_function_represented_by_the_parser()
+    function it_calls_the_function()
     {
-        $this->beConstructedThrough('parseFromUnderscore', ['strlen']);
-        $this->call(['test'])->shouldReturn(4);
+        $this->beConstructedThrough('parseFromUnderscore', [ 'strlen' ]);
+
+        $this->call([ 'test' ])->shouldReturn(4);
     }
 
     function it_throws_an_exception_when_instructed_to_throw_an_exception()
     {
-        $this->shouldThrow('\BadFunctionCallException')
+        $this->shouldThrow(BadFunctionCallException::class)
             ->during('throwException');
     }
 
     function it_throws_an_exception_if_the_function_does_not_exist()
     {
-        $this->shouldThrow('\BadFunctionCallException')
+        $this->shouldThrow(BadFunctionCallException::class)
             ->during('throwExceptionIfMissing');
     }
 }

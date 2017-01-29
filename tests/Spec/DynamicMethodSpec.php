@@ -2,11 +2,11 @@
 
 namespace Spec\Monospice\SpicyIdentifiers;
 
+use BadMethodCallException;
+use Monospice\SpicyIdentifiers\DynamicMethod;
+use Monospice\SpicyIdentifiers\DynamicIdentifier;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-
-use Monospice\SpicyIdentifiers\Tools\CaseFormat;
-use Monospice\SpicyIdentifiers\DynamicMethod;
 
 class DynamicMethodSpec extends ObjectBehavior
 {
@@ -19,86 +19,85 @@ class DynamicMethodSpec extends ObjectBehavior
 
     function let()
     {
-        $this->identifierParts = ['name'];
+        $this->identifierParts = [ 'name' ];
         $this->beConstructedWith($this->identifierParts);
     }
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicMethod');
-        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
+        $this->shouldHaveType(DynamicMethod::class);
+        $this->shouldHaveType(DynamicIdentifier::class);
     }
 
-    function it_determines_if_the_method_exists_in_the_given_context()
+    function it_determines_if_the_method_exists()
     {
         $this->existsOn($this)->shouldReturn(true);
     }
 
-    function it_calls_the_method_represented_by_the_parser()
+    function it_calls_the_method()
     {
         $this->callOn($this)->shouldReturn('name');
     }
 
-    function it_calls_the_static_method_represented_by_the_parser()
+    function it_calls_the_static_method()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['staticTest']);
+        $this->beConstructedThrough('parseFromCamelCase', [ 'staticTest' ]);
 
-        $this->callOn('Spec\Monospice\SpicyIdentifiers\StaticTestStub')
-            ->shouldReturn('static');
+        $this->callOn(StaticTestStub::class, [ 'TestArg' ])
+            ->shouldReturn('staticTestArg');
     }
 
-    function it_invokes_the_method_represented_by_the_parser()
+    function it_calls_the_method_from_a_scope()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['privateTest']);
-        $privateTestStub = new \Spec\Monospice\SpicyIdentifiers\PrivateTestStub;
+        $this->beConstructedThrough('parseFromCamelCase', [ 'privateTest' ]);
 
-        $this->invokeOn($privateTestStub)->shouldReturn('private');
+        $this->callFromScopeOn(new PrivateTestStub(), [ 'TestArg' ])
+            ->shouldReturn('privateTestArg');
     }
 
-    function it_statically_invokes_the_method_represented_by_the_parser()
+    function it_calls_the_static_method_from_a_scope()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['privateTest']);
+        $this->beConstructedThrough('parseFromCamelCase', [ 'privateTest' ]);
 
-        $this->invokeOn('Spec\Monospice\SpicyIdentifiers\PrivateTestStub')
-            ->shouldReturn('private');
+        $this->callFromScopeOn(PrivateTestStub::class, [ 'TestArg' ])
+            ->shouldReturn('privateTestArg');
     }
 
-    function it_forwards_the_static_call_to_a_method_represented_by_the_parser()
+    function it_forwards_the_static_call_to_a_method()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['staticTest']);
+        $this->beConstructedThrough('parseFromCamelCase', [ 'staticTest' ]);
 
-        $this->forwardStaticCallTo(
-            'Spec\Monospice\SpicyIdentifiers\StaticTestStub'
-        )->shouldReturn('static');
+        $this->forwardStaticCallTo(StaticTestStub::class, [ 'TestArg' ])
+            ->shouldReturn('staticTestArg');
     }
 
     function it_throws_an_exception_when_instructed_to_throw_an_exception()
     {
-        $this->shouldThrow('\BadMethodCallException')
+        $this->shouldThrow(BadMethodCallException::class)
             ->during('throwException');
     }
 
     function it_throws_an_exception_if_the_method_does_not_exist()
     {
-        $this->beConstructedThrough('parseFromCamelCase', ['notAMethod']);
+        $this->beConstructedThrough('parseFromCamelCase', [ 'notAMethod' ]);
 
-        $this->shouldThrow('\BadMethodCallException')
-            ->during('throwExceptionIfMissingOn', [$this]);
+        $this->shouldThrow(BadMethodCallException::class)
+            ->during('throwExceptionIfMissingOn', [ $this ]);
     }
 }
 
 class StaticTestStub
 {
-    public static function staticTest()
+    public static function staticTest($testArg)
     {
-        return 'static';
+        return 'static' . $testArg;
     }
 }
 
 class PrivateTestStub
 {
-    private static function privateTest()
+    private static function privateTest($testArg)
     {
-        return 'private';
+        return 'private' . $testArg;
     }
 }
