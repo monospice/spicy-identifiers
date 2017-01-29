@@ -29,17 +29,17 @@ class DynamicIdentifierSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
     }
 
     function it_is_array_accessible()
     {
-        $this->shouldImplement(ArrayAccess::class);
+        $this->shouldImplement('ArrayAccess');
     }
 
     function it_is_countable()
     {
-        $this->shouldImplement(Countable::class);
+        $this->shouldImplement('Countable');
     }
 
     function it_formats_the_entire_identifier_name()
@@ -133,7 +133,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('from', [ 'anIdentifierName' ]);
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn([ 'anIdentifierName' ]);
     }
 
@@ -141,7 +141,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('fromParts', [ $this->identifierParts ]);
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn($this->identifierParts);
     }
 
@@ -152,7 +152,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
             [ 'anIdentifierName' ]
         );
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn([ 'an', 'Identifier', 'Name' ]);
     }
 
@@ -163,7 +163,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
             [ 'änÏdentifierNáme' ]
         );
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn([ 'än', 'Ïdentifier', 'Náme' ]);
     }
 
@@ -174,7 +174,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
             [ 'an_identifier_name' ]
         );
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn([ 'an', 'identifier', 'name' ]);
     }
 
@@ -185,7 +185,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
             [ 'an-identifier-name' ]
         );
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn([ 'an', 'identifier', 'name' ]);
     }
 
@@ -203,7 +203,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
             ]
         );
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn([ 'a', 'Mixed', 'case', 'identifier' ]);
     }
 
@@ -211,7 +211,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('parse', [ 'anIdentifierName' ]);
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->parts()->shouldReturn([ 'an', 'Identifier', 'Name' ]);
     }
 
@@ -227,7 +227,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
             [ 'an-identifier-name' ]
         );
 
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
         $this->getOutputFormat()->shouldReturn(CaseFormat::CAMEL_CASE);
     }
 
@@ -309,12 +309,14 @@ class DynamicIdentifierSpec extends ObjectBehavior
 
     function it_casts_to_a_dynamic_function()
     {
-        $this->toFunction()->shouldHaveType(DynamicFunction::class);
+        $this->toFunction()
+            ->shouldHaveType('Monospice\SpicyIdentifiers\DynamicFunction');
     }
 
     function it_casts_to_a_dynamic_method()
     {
-        $this->toMethod()->shouldHaveType(DynamicMethod::class);
+        $this->toMethod()
+            ->shouldHaveType('Monospice\SpicyIdentifiers\DynamicMethod');
     }
 
     function it_casts_to_an_array()
@@ -330,7 +332,7 @@ class DynamicIdentifierSpec extends ObjectBehavior
 
     function it_throws_an_exception_when_replacing_a_part_that_does_not_exist()
     {
-        $this->shouldThrow(OutOfBoundsException::class)
+        $this->shouldThrow('OutOfBoundsException')
             ->during('replace', [ 999, 'invalid' ]);
     }
 }

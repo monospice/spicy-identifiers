@@ -25,8 +25,8 @@ class DynamicFunctionSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType(DynamicFunction::class);
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicFunction');
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
     }
 
     function it_determines_if_the_function_exists()
@@ -52,13 +52,13 @@ class DynamicFunctionSpec extends ObjectBehavior
 
     function it_throws_an_exception_when_instructed_to_throw_an_exception()
     {
-        $this->shouldThrow(BadFunctionCallException::class)
+        $this->shouldThrow('BadFunctionCallException')
             ->during('throwException');
     }
 
     function it_throws_an_exception_if_the_function_does_not_exist()
     {
-        $this->shouldThrow(BadFunctionCallException::class)
+        $this->shouldThrow('BadFunctionCallException')
             ->during('throwExceptionIfMissing');
     }
 }

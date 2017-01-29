@@ -25,8 +25,8 @@ class DynamicMethodSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType(DynamicMethod::class);
-        $this->shouldHaveType(DynamicIdentifier::class);
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicMethod');
+        $this->shouldHaveType('Monospice\SpicyIdentifiers\DynamicIdentifier');
     }
 
     function it_determines_if_the_method_exists()
@@ -43,7 +43,11 @@ class DynamicMethodSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('parseFromCamelCase', [ 'staticTest' ]);
 
-        $this->callOn(StaticTestStub::class, [ 'TestArg' ])
+        $this
+            ->callOn(
+                'Spec\Monospice\SpicyIdentifiers\StaticTestStub',
+                [ 'TestArg' ]
+            )
             ->shouldReturn('staticTestArg');
     }
 
@@ -59,7 +63,11 @@ class DynamicMethodSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('parseFromCamelCase', [ 'privateTest' ]);
 
-        $this->callFromScopeOn(PrivateTestStub::class, [ 'TestArg' ])
+        $this
+            ->callFromScopeOn(
+                'Spec\Monospice\SpicyIdentifiers\PrivateTestStub',
+                [ 'TestArg' ]
+            )
             ->shouldReturn('privateTestArg');
     }
 
@@ -67,13 +75,17 @@ class DynamicMethodSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('parseFromCamelCase', [ 'staticTest' ]);
 
-        $this->forwardStaticCallTo(StaticTestStub::class, [ 'TestArg' ])
+        $this
+            ->forwardStaticCallTo(
+                'Spec\Monospice\SpicyIdentifiers\StaticTestStub',
+                [ 'TestArg' ]
+            )
             ->shouldReturn('staticTestArg');
     }
 
     function it_throws_an_exception_when_instructed_to_throw_an_exception()
     {
-        $this->shouldThrow(BadMethodCallException::class)
+        $this->shouldThrow('BadMethodCallException')
             ->during('throwException');
     }
 
@@ -81,7 +93,7 @@ class DynamicMethodSpec extends ObjectBehavior
     {
         $this->beConstructedThrough('parseFromCamelCase', [ 'notAMethod' ]);
 
-        $this->shouldThrow(BadMethodCallException::class)
+        $this->shouldThrow('BadMethodCallException')
             ->during('throwExceptionIfMissingOn', [ $this ]);
     }
 }
